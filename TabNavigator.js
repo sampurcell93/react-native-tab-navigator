@@ -22,7 +22,8 @@ export default class TabNavigator extends React.Component {
     sceneStyle: View.propTypes.style,
     tabBarStyle: TabBar.propTypes.style,
     tabBarShadowStyle: TabBar.propTypes.shadowStyle,
-    hidesTabTouch: PropTypes.bool
+    hidesTabTouch: PropTypes.bool,
+    renderPlayer: PropTypes.func
   };
 
   constructor(props, context) {
@@ -88,6 +89,7 @@ export default class TabNavigator extends React.Component {
       <View {...props} style={[styles.container, style]}>
         {scenes}
         <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle}>
+          {this.props.renderPlayer && this.props.renderPlayer()}
           {React.Children.map(children, this._renderTab)}
         </TabBar>
       </View>

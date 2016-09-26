@@ -20,7 +20,6 @@ export default class TabBar extends React.Component {
     return (
       <Animated.View {...this.props} style={[styles.container, this.props.style]}>
         {this.props.children}
-        <View style={[styles.shadow, this.props.shadowStyle]} />
       </Animated.View>
     );
   }
@@ -36,6 +35,7 @@ let styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    elevation: 12
   },
   shadow: {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
