@@ -6,8 +6,8 @@ import {
   Platform,
   StyleSheet,
   View,
+  Dimensions
 } from 'react-native';
-
 import Layout from './Layout';
 
 export default class TabBar extends React.Component {
@@ -32,17 +32,10 @@ let styles = StyleSheet.create({
     justifyContent: 'space-around',
     height: Layout.tabBarHeight,
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    elevation: 12
-  },
-  shadow: {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    height: Layout.pixel,
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: Platform.OS === 'android' ? 0 : -Layout.pixel,
-  },
+    bottom: 15,
+    left: 15,
+    right: 15,
+    elevation: 12,
+    borderRadius: 4
+  }
 });
