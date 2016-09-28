@@ -89,7 +89,6 @@ export default class TabNavigator extends React.Component {
       <View {...props} style={[styles.container, style]}>
         {scenes}
         <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle}>
-          {this.props.renderPlayer && this.props.renderPlayer()}
           {React.Children.map(children, this._renderTab)}
         </TabBar>
       </View>
@@ -178,8 +177,7 @@ let styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    paddingBottom: Layout.tabBarHeight,
+    bottom: 0
   },
   hiddenSceneContainer: {
     overflow: 'hidden',
