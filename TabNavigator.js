@@ -22,8 +22,7 @@ export default class TabNavigator extends React.Component {
     sceneStyle: View.propTypes.style,
     tabBarStyle: TabBar.propTypes.style,
     tabBarShadowStyle: TabBar.propTypes.shadowStyle,
-    hidesTabTouch: PropTypes.bool,
-    renderPlayer: PropTypes.func
+    hidesTabTouch: PropTypes.bool
   };
 
   constructor(props, context) {
@@ -52,9 +51,6 @@ export default class TabNavigator extends React.Component {
   _updateRenderedSceneKeys(children, oldSceneKeys = Set()): Set {
     let newSceneKeys = Set().asMutable();
     React.Children.forEach(children, (item, index) => {
-      if (item === null) {
-        return;
-      }
       let key = this._getSceneKey(item, index);
       if (oldSceneKeys.has(key) || item.props.selected) {
         newSceneKeys.add(key);
@@ -68,9 +64,6 @@ export default class TabNavigator extends React.Component {
     let scenes = [];
 
     React.Children.forEach(children, (item, index) => {
-      if (item === null) {
-        return;
-      }
       let sceneKey = this._getSceneKey(item, index);
       if (!this.state.renderedSceneKeys.has(sceneKey)) {
         return;
@@ -89,6 +82,7 @@ export default class TabNavigator extends React.Component {
       <View {...props} style={[styles.container, style]}>
         {scenes}
         <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle}>
+          {this.props.renderPlayer && this.props.renderPlayer()}
           {React.Children.map(children, this._renderTab)}
         </TabBar>
       </View>
@@ -97,9 +91,6 @@ export default class TabNavigator extends React.Component {
 
   _renderTab(item) {
     let icon;
-    if (item === null) {
-      return;
-    }
     if (item.props.selected) {
       if (item.props.renderSelectedIcon) {
         icon = item.props.renderSelectedIcon();
@@ -177,7 +168,8 @@ let styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
+    paddingBottom: Layout.tabBarHeight,
   },
   hiddenSceneContainer: {
     overflow: 'hidden',
