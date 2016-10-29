@@ -1,8 +1,8 @@
 'use strict';
 
-import { PixelRatio } from 'react-native';
+import { PixelRatio, Dimensions } from 'react-native';
 
 export default {
   pixel: 1 / PixelRatio.get(),
-  tabBarHeight: 56,
+  tabBarHeight: Dimensions.get('window').height,
 };

@@ -81,7 +81,7 @@ export default class TabNavigator extends React.Component {
     return (
       <View {...props} style={[styles.container, style]}>
         {scenes}
-        <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle}>
+        <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle} renderSwipeUpContent={this.props.renderSwipeUpContent} canSwipeUp={this.props.canSwipeUp}>
           {this.props.renderPlayer && this.props.renderPlayer()}
           {React.Children.map(children, this._renderTab)}
         </TabBar>
@@ -169,7 +169,7 @@ let styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingBottom: Layout.tabBarHeight,
+    paddingBottom: 57
   },
   hiddenSceneContainer: {
     overflow: 'hidden',
