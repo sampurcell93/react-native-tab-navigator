@@ -38,6 +38,9 @@ export default class TabBar extends React.Component {
       },
       close: () => {
         this.animateClosed();
+      },
+      open: () => {
+        this.animateOpen();
       }
     }
   }
@@ -66,18 +69,20 @@ export default class TabBar extends React.Component {
         // gestureState.{x,y}0 will be set to zero now
       },
       onPanResponderMove: (evt, gestureState) => {
+        const {dy} = gestureState;
+        const {maxHeight} = this.state;
         // The most recent move distance is gestureState.move{X,Y}
         if (!this.state.isOpen && this.props.canSwipeUp) {
-          if (gestureState.dy <= 0) {
-            this.state.positionY.setValue(gestureState.dy)
-            this.state.tabBarOpacity.setValue(1 - (gestureState.dy / this.state.maxHeight))
-            this.state.playerOpacity.setValue(gestureState.dy / this.state.maxHeight)
+          if (dy <= 0) {
+            this.state.positionY.setValue(dy)
+            this.state.tabBarOpacity.setValue(1 - (dy / maxHeight))
+            this.state.playerOpacity.setValue(dy / maxHeight)
           }
         } else {
-          if (gestureState.dy >= 0) {
-            this.state.positionY.setValue(this.state.maxHeight + gestureState.dy)
-            this.state.tabBarOpacity.setValue(gestureState.dy / Math.abs(this.state.maxHeight))
-            this.state.playerOpacity.setValue(1 - (gestureState.dy / Math.abs(this.state.maxHeight)))
+          if (dy >= 0) {
+            this.state.positionY.setValue(maxHeight + dy)
+            this.state.tabBarOpacity.setValue(dy / Math.abs(maxHeight))
+            this.state.playerOpacity.setValue(1 - (dy / Math.abs(maxHeight)))
           }
         }
         // }
@@ -87,14 +92,15 @@ export default class TabBar extends React.Component {
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
         // The user has released all touches while this view is the
+        const vy = Math.abs(gestureState.vy);
         if (!this.state.isOpen) {
-          if (Math.abs(gestureState.dy) <= height / 10) {
+          if (Math.abs(gestureState.dy * (1 - vy)) <= height / 10) {
             this.animateClosed();
           } else {
             this.animateOpen()
           }
         } else {
-          if (gestureState.dy >= 0 && Math.abs(gestureState.dy) >= height / 4) {
+          if (gestureState.dy >= 0 && Math.abs(gestureState.dy * (1 + vy)) >= height / 7) {
             this.animateClosed()
           } else {
             this.animateOpen();
@@ -105,6 +111,11 @@ export default class TabBar extends React.Component {
       onPanResponderTerminate: (evt, gestureState) => {
         // Another component has become the responder, so this gesture
         // should be cancelled
+        if (this.isOpen) {
+          this.animateOpen();
+        } else {
+          this.animateClosed();
+        }
         return true;
       },
       onShouldBlockNativeResponder: (evt, gestureState) => {
@@ -117,9 +128,9 @@ export default class TabBar extends React.Component {
   animateOpen() {
     if (this.props.canSwipeUp) {
       Animated.parallel([
-        Animated.spring(this.state.positionY, {isInteraction: false, toValue: this.state.maxHeight}).start(),
-        Animated.spring(this.state.tabBarOpacity, {isInteraction: false, toValue: 0}).start(),
-        Animated.spring(this.state.playerOpacity, {isInteraction: false, toValue: 1}).start()
+        Animated.spring(this.state.positionY, {toValue: this.state.maxHeight}).start(),
+        Animated.spring(this.state.tabBarOpacity, {toValue: 0}).start(),
+        Animated.spring(this.state.playerOpacity, {toValue: 1}).start()
       ]).start(() => {
         this.setState({
           isOpen: true
@@ -129,9 +140,9 @@ export default class TabBar extends React.Component {
   }
   animateClosed() {
     Animated.parallel([
-      Animated.spring(this.state.positionY, {isInteraction: false, toValue: 0}).start(),
-      Animated.spring(this.state.tabBarOpacity, {isInteraction: false, toValue: 1}).start(),
-      Animated.spring(this.state.playerOpacity, {isInteraction: false, toValue: 0}).start()
+      Animated.spring(this.state.positionY, {toValue: 0}).start(),
+      Animated.spring(this.state.tabBarOpacity, {toValue: 1}).start(),
+      Animated.spring(this.state.playerOpacity, {toValue: 0}).start()
     ]).start(() => {
       this.setState({
         isOpen: false
@@ -142,6 +153,7 @@ export default class TabBar extends React.Component {
     return (
       <Animated.View {...this.props} style={[styles.container, {transform: [{translateY: this.state.positionY}]}]} {...this.pan.panHandlers}>
         <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, {opacity: this.state.tabBarOpacity}]}>
+          {this.props.renderPlayer && this.props.renderPlayer(this.swipeUpRenderProps)}
           {this.props.children}
         </Animated.View>
         <StaticContainer shouldUpdate={this.state.isOpen}>
@@ -162,6 +174,8 @@ let styles = StyleSheet.create({
     top: Layout.tabBarHeight - 57,
     left: 0,
     right: 0,
+    borderTopColor: '#eee',
+    borderTopWidth: 1
   },
   inner: {
     elevation: 12,
