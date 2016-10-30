@@ -1,202 +1,185 @@
 'use strict';
 
-import React from 'react';
+import { Set } from 'immutable';
+import React, {
+  PropTypes,
+} from 'react';
 import {
-  Animated,
-  Platform,
   StyleSheet,
   View,
-  Dimensions,
-  PanResponder
 } from 'react-native';
+
+import Badge from './Badge';
 import Layout from './Layout';
 import StaticContainer from './StaticContainer';
+import Tab from './Tab';
+import TabBar from './TabBar';
+import TabNavigatorItem from './TabNavigatorItem';
 
-const {height} = Dimensions.get('window');
-
-export default class TabBar extends React.Component {
+export default class TabNavigator extends React.Component {
   static propTypes = {
-    ...Animated.View.propTypes,
-    shadowStyle: View.propTypes.style,
+    ...View.propTypes,
+    sceneStyle: View.propTypes.style,
+    tabBarStyle: TabBar.propTypes.style,
+    tabBarShadowStyle: TabBar.propTypes.shadowStyle,
+    hidesTabTouch: PropTypes.bool
   };
-  constructor(props) {
-    super(props);
+
+  constructor(props, context) {
+    super(props, context);
     this.state = {
-      positionY: new Animated.Value(0),
-      tabBarOpacity: new Animated.Value(1),
-      playerOpacity: new Animated.Value(0),
-      overrideSwipe: false,
-      maxHeight: -(height - 57),
-      isOpen: false
-    }
-    this.swipeUpRenderProps = {
-      disableSwipe: () => {
-        this.state.overrideSwipe = true;
-      },
-      enableSwipe: () => {
-        this.state.overrideSwipe = false;
-      },
-      close: () => {
-        this.animateClosed();
-      },
-      open: () => {
-        this.animateOpen();
+      renderedSceneKeys: this._updateRenderedSceneKeys(props.children),
+    };
+
+    this._renderTab = this._renderTab.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    let { renderedSceneKeys } = this.state;
+    this.setState({
+      renderedSceneKeys: this._updateRenderedSceneKeys(
+        nextProps.children,
+        renderedSceneKeys,
+      ),
+    });
+  }
+
+  _getSceneKey(item, index): string {
+    return `scene-${(item.key !== null) ? item.key : index}`;
+  }
+
+  _updateRenderedSceneKeys(children, oldSceneKeys = Set()): Set {
+    let newSceneKeys = Set().asMutable();
+    React.Children.forEach(children, (item, index) => {
+      let key = this._getSceneKey(item, index);
+      if (oldSceneKeys.has(key) || item.props.selected) {
+        newSceneKeys.add(key);
       }
-    }
-  }
-  componentWillMount() {
-    this.pan = PanResponder.create({
-      // Ask to be the responder:
-      onStartShouldSetPanResponder: (evt, gestureState) => false,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        if (this.state.overrideSwipe) {
-          return false;
-        }
-        if (Math.abs(gestureState.dx / gestureState.dy) >= 1.5) {
-          return false;
-        } else if (gestureState.dy === 0) {
-          return false;
-        }
-        return true;
-      },
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
-
-      onPanResponderGrant: (evt, gestureState) => {
-        // The guesture has started. Show visual feedback so the user knows
-        // what is happening!
-
-        // gestureState.{x,y}0 will be set to zero now
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        const {dy} = gestureState;
-        const {maxHeight} = this.state;
-        // The most recent move distance is gestureState.move{X,Y}
-        if (!this.state.isOpen && this.props.canSwipeUp) {
-          if (dy <= 0) {
-            this.state.positionY.setValue(dy)
-            this.state.tabBarOpacity.setValue(1 - (dy / maxHeight))
-            this.state.playerOpacity.setValue(dy / maxHeight)
-          }
-        } else {
-          if (dy >= 0) {
-            this.state.positionY.setValue(maxHeight + dy)
-            this.state.tabBarOpacity.setValue(dy / Math.abs(maxHeight))
-            this.state.playerOpacity.setValue(1 - (dy / Math.abs(maxHeight)))
-          }
-        }
-        // }
-        // The accumulated gesture distance since becoming responder is
-        // gestureState.d{x,y}
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        // The user has released all touches while this view is the
-        const vy = Math.abs(gestureState.vy);
-        if (!this.state.isOpen) {
-          if (Math.abs(gestureState.dy * (1 - vy)) <= height / 10) {
-            this.animateClosed();
-          } else {
-            this.animateOpen()
-          }
-        } else {
-          if (gestureState.dy >= 0 && Math.abs(gestureState.dy * (1 + vy)) >= height / 7) {
-            this.animateClosed()
-          } else {
-            this.animateOpen();
-          }
-        }
-        // responder. This typically means a gesture has succeeded
-      },
-      onPanResponderTerminate: (evt, gestureState) => {
-        // Another component has become the responder, so this gesture
-        // should be cancelled
-        if (this.isOpen) {
-          this.animateOpen();
-        } else {
-          this.animateClosed();
-        }
-        return true;
-      },
-      onShouldBlockNativeResponder: (evt, gestureState) => {
-        // Returns whether this component should block native components from becoming the JS
-        // responder. Returns true by default. Is currently only supported on android.
-        return false;
-      },
     });
+    return newSceneKeys.asImmutable();
   }
-  animateOpen() {
-    if (this.props.canSwipeUp) {
-      Animated.parallel([
-        Animated.spring(this.state.positionY, {toValue: this.state.maxHeight}).start(),
-        Animated.spring(this.state.tabBarOpacity, {toValue: 0}).start(),
-        Animated.spring(this.state.playerOpacity, {toValue: 1}).start()
-      ]).start(() => {
-        this.setState({
-          isOpen: true
-        })
-      });
-    }
-  }
-  animateClosed() {
-    Animated.parallel([
-      Animated.spring(this.state.positionY, {toValue: 0}).start(),
-      Animated.spring(this.state.tabBarOpacity, {toValue: 1}).start(),
-      Animated.spring(this.state.playerOpacity, {toValue: 0}).start()
-    ]).start(() => {
-      this.setState({
-        isOpen: false
-      })
-    });
-  }
+
   render() {
+    let { style, children, tabBarStyle, tabBarShadowStyle, sceneStyle, ...props } = this.props;
+    let scenes = [];
+
+    React.Children.forEach(children, (item, index) => {
+      let sceneKey = this._getSceneKey(item, index);
+      if (!this.state.renderedSceneKeys.has(sceneKey)) {
+        return;
+      }
+
+      let { selected } = item.props;
+      let scene =
+        <SceneContainer key={sceneKey} selected={selected} style={sceneStyle}>
+          {item}
+        </SceneContainer>;
+
+      scenes.push(scene);
+    });
+
     return (
-      <Animated.View {...this.props} style={[styles.container, {transform: [{translateY: this.state.positionY}]}]} {...this.pan.panHandlers}>
-        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, {opacity: this.state.tabBarOpacity}]}>
-          {this.props.renderPlayer && this.props.renderPlayer(this.swipeUpRenderProps)}
+      <View {...props} style={[styles.container, style]}>
+        {scenes}
+        <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle} renderSwipeUpContent={this.props.renderSwipeUpContent} canSwipeUp={this.props.canSwipeUp} renderPlayer={this.props.renderPlayer}>
+          {React.Children.map(children, this._renderTab)}
+        </TabBar>
+      </View>
+    );
+  }
+
+  _renderTab(item) {
+    let icon;
+    if (item.props.selected) {
+      if (item.props.renderSelectedIcon) {
+        icon = item.props.renderSelectedIcon();
+      } else if (item.props.renderIcon) {
+        let defaultIcon = item.props.renderIcon();
+        icon = React.cloneElement(defaultIcon, {
+          style: [defaultIcon.props.style, styles.defaultSelectedIcon],
+        });
+      }
+    } else if (item.props.renderIcon) {
+      icon = item.props.renderIcon();
+    }
+
+    let badge;
+    if (item.props.renderBadge) {
+      badge = item.props.renderBadge();
+    } else if (item.props.badgeText) {
+      badge = <Badge>{item.props.badgeText}</Badge>;
+    }
+
+    return (
+      <Tab
+        testID={item.props.testID}
+        title={item.props.title}
+        allowFontScaling={item.props.allowFontScaling}
+        titleStyle={[
+          item.props.titleStyle,
+          item.props.selected ? [
+            styles.defaultSelectedTitle,
+            item.props.selectedTitleStyle,
+          ] : null,
+        ]}
+        badge={badge}
+        onPress={item.props.onPress}
+        hidesTabTouch={this.props.hidesTabTouch}
+        style={item.props.tabStyle}>
+        {icon}
+      </Tab>
+    );
+  }
+}
+
+class SceneContainer extends React.Component {
+  static propTypes = {
+    ...View.propTypes,
+    selected: PropTypes.bool,
+  };
+
+  render() {
+    let { selected, ...props } = this.props;
+    return (
+      <View
+        {...props}
+        pointerEvents={selected ? 'auto' : 'none'}
+        removeClippedSubviews={!selected}
+        style={[
+          styles.sceneContainer,
+          selected ? null : styles.hiddenSceneContainer,
+          props.style,
+        ]}>
+        <StaticContainer shouldUpdate={selected}>
           {this.props.children}
-        </Animated.View>
-        <StaticContainer shouldUpdate={this.state.isOpen}>
-          <Animated.View style={{opacity: this.state.playerOpacity}}>
-            {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
-          </Animated.View>
         </StaticContainer>
-      </Animated.View>
+      </View>
     );
   }
 }
 
 let styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    height: Layout.tabBarHeight,
-    position: 'absolute',
-    top: Layout.tabBarHeight - 57,
-    left: 0,
-    right: 0,
-    borderTopColor: '#eee',
-    borderTopWidth: 1
+    flex: 1,
   },
-  inner: {
-    elevation: 12,
+  sceneContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1,
-    shadowColor: 'rgba(0,0,0,0.5)',
-    shadowRadius: -3,
-    shadowOffset: {width: 0, height: 10},
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-start',
+    bottom: 0,
+    paddingBottom: 57
   },
-  shadow: {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    height: Layout.pixel,
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: Platform.OS === 'android' ? 0 : -Layout.pixel,
+  hiddenSceneContainer: {
+    overflow: 'hidden',
+    opacity: 0,
+  },
+  defaultSelectedTitle: {
+    color: 'rgb(0, 122, 255)',
+  },
+  defaultSelectedIcon: {
+    tintColor: 'rgb(0, 122, 255)',
   },
 });
+
+TabNavigator.Item = TabNavigatorItem;
