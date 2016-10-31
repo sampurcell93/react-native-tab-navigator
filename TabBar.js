@@ -7,6 +7,7 @@ import {
   StyleSheet,
   View,
   Dimensions,
+  StatusBar,
   PanResponder
 } from 'react-native';
 import Layout from './Layout';
