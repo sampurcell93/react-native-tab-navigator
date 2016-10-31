@@ -50,10 +50,13 @@ export default class TabBar extends React.Component {
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        if (this.state.overrideSwipe) {
+        if (this.state.overrideSwipe && this.state.isOpen) {
           return false;
-        }
-        if (Math.abs(gestureState.dx / gestureState.dy) >= 1.5) {
+        } else if (this.state.isOpen && gestureState.dy < 0) {
+          return false;
+        } else if (this.state.isClosed && gestureState.dy > 0) {
+          return false;
+        } else if (Math.abs(gestureState.dx / gestureState.dy) >= 1.5) {
           return false;
         } else if (gestureState.dy === 0) {
           return false;
@@ -132,13 +135,16 @@ export default class TabBar extends React.Component {
         Animated.spring(this.state.tabBarOpacity, {toValue: 0}).start(),
         Animated.spring(this.state.playerOpacity, {toValue: 1}).start()
       ]).start(() => {
+        StatusBar.setHidden(true, true);
         this.setState({
-          isOpen: true
+          isOpen: true,
+          overrideSwipe: true
         })
       });
     }
   }
   animateClosed() {
+    StatusBar.setHidden(false, true);
     Animated.parallel([
       Animated.spring(this.state.positionY, {toValue: 0}).start(),
       Animated.spring(this.state.tabBarOpacity, {toValue: 1}).start(),
