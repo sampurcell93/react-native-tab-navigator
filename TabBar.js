@@ -80,13 +80,13 @@ export default class TabBar extends React.Component {
           if (dy <= 0) {
             this.state.positionY.setValue(dy)
             this.state.tabBarOpacity.setValue(1 - (dy / maxHeight))
-            this.state.playerOpacity.setValue(dy / maxHeight)
+            this.state.playerOpacity.setValue(.25 + (dy / maxHeight))
           }
         } else {
           if (dy >= 0) {
             this.state.positionY.setValue(maxHeight + dy)
             this.state.tabBarOpacity.setValue(dy / Math.abs(maxHeight))
-            this.state.playerOpacity.setValue(1 - (dy / Math.abs(maxHeight)))
+            this.state.playerOpacity.setValue(1.25 - (dy / Math.abs(maxHeight)))
           }
         }
         // }
@@ -132,9 +132,21 @@ export default class TabBar extends React.Component {
   animateOpen() {
     if (this.props.canSwipeUp) {
       Animated.parallel([
-        Animated.spring(this.state.positionY, {toValue: this.state.maxHeight}).start(),
-        Animated.spring(this.state.tabBarOpacity, {toValue: 0}).start(),
-        Animated.spring(this.state.playerOpacity, {toValue: 1}).start()
+        Animated.spring(this.state.positionY, {
+          toValue: this.state.maxHeight,
+          friction: 15,
+          tension: 125
+        }).start(),
+        Animated.spring(this.state.tabBarOpacity, {
+          toValue: 0, 
+          friction: 15,
+          tension: 125
+        }).start(),
+        Animated.spring(this.state.playerOpacity, {
+          toValue: 1,
+          friction: 15,
+          tension: 125
+        }).start()
       ]).start(() => {
         StatusBar.setHidden(true, true);
         this.setState({
@@ -147,9 +159,21 @@ export default class TabBar extends React.Component {
   animateClosed() {
     StatusBar.setHidden(false, true);
     Animated.parallel([
-      Animated.spring(this.state.positionY, {toValue: 0}).start(),
-      Animated.spring(this.state.tabBarOpacity, {toValue: 1}).start(),
-      Animated.spring(this.state.playerOpacity, {toValue: 0}).start()
+      Animated.spring(this.state.positionY, {
+        toValue: 0,
+        friction: 15,
+        tension: 100
+      }).start(),
+      Animated.spring(this.state.tabBarOpacity, {
+        toValue: 1,
+        friction: 15,
+        tension: 100
+      }).start(),
+      Animated.spring(this.state.playerOpacity, {
+        toValue: .25,
+        friction: 15,
+        tension: 100
+      }).start()
     ]).start(() => {
       this.setState({
         isOpen: false
