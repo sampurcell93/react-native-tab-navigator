@@ -27,7 +27,7 @@ export default class TabBar extends React.Component {
       tabBarOpacity: new Animated.Value(1),
       playerOpacity: new Animated.Value(0),
       overrideSwipe: false,
-      maxHeight: -(height - 57),
+      maxHeight: -(height - 56),
       isOpen: false
     }
     this.swipeUpRenderProps = {
