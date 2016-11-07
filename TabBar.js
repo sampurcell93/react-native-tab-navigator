@@ -55,7 +55,7 @@ export default class TabBar extends React.Component {
           return false;
         } else if (this.state.isOpen && gestureState.dy < 0) {
           return false;
-        } else if (this.state.isClosed && gestureState.dy > 0) {
+        } else if (!this.state.isOpen && gestureState.dy > 0) {
           return false;
         } else if (Math.abs(gestureState.dx / gestureState.dy) >= 1.5) {
           return false;
