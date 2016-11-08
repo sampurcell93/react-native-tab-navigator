@@ -130,6 +130,11 @@ export default class TabBar extends React.Component {
       },
     });
   }
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevProps.canSwipeUp && this.props.canSwipeUp && this.swipeUpContent) {
+      this.swipeUpContent.forceUpdate();
+    }
+  }
   animateOpen() {
     if (this.props.canSwipeUp) {
       Animated.parallel([
@@ -151,6 +156,7 @@ export default class TabBar extends React.Component {
       ]).start(() => {
         StatusBar.setHidden(true, true);
         this.setState({
+          hasOpenedBefore: true,
           isOpen: true
         })
       });
@@ -187,7 +193,7 @@ export default class TabBar extends React.Component {
           {this.props.renderPlayer && this.props.renderPlayer(this.swipeUpRenderProps)}
           {this.props.children}
         </Animated.View>
-        <StaticContainer shouldUpdate={this.state.isOpen}>
+        <StaticContainer ref={c => this.swipeUpContent = c} shouldUpdate={this.state.isOpen}>
           <Animated.View style={{opacity: this.state.playerOpacity}}>
             {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
           </Animated.View>
