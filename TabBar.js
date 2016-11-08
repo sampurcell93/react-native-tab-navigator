@@ -6,6 +6,7 @@ import {
   Platform,
   StyleSheet,
   View,
+  Easing,
   Dimensions,
   StatusBar,
   PanResponder
@@ -132,21 +133,21 @@ export default class TabBar extends React.Component {
   animateOpen() {
     if (this.props.canSwipeUp) {
       Animated.parallel([
-        Animated.spring(this.state.positionY, {
+        Animated.timing(this.state.positionY, {
           toValue: this.state.maxHeight,
-          friction: 15,
-          tension: 125
-        }).start(),
-        Animated.spring(this.state.tabBarOpacity, {
+          duration: 200,
+          easing: Easing.elastic(0.8)
+        }),
+        Animated.timing(this.state.tabBarOpacity, {
           toValue: 0, 
-          friction: 15,
-          tension: 125
-        }).start(),
-        Animated.spring(this.state.playerOpacity, {
+          duration: 200,
+          easing: Easing.elastic(0.8)
+        }),
+        Animated.timing(this.state.playerOpacity, {
           toValue: 1,
-          friction: 15,
-          tension: 125
-        }).start()
+          duration: 200,
+          easing: Easing.elastic(0.8)
+        })
       ]).start(() => {
         StatusBar.setHidden(true, true);
         this.setState({
@@ -159,21 +160,21 @@ export default class TabBar extends React.Component {
   animateClosed() {
     StatusBar.setHidden(false, true);
     Animated.parallel([
-      Animated.spring(this.state.positionY, {
+      Animated.timing(this.state.positionY, {
         toValue: 0,
-        friction: 15,
-        tension: 100
-      }).start(),
-      Animated.spring(this.state.tabBarOpacity, {
+        duration: 200,
+        easing: Easing.elastic(0.8)
+      }),
+      Animated.timing(this.state.tabBarOpacity, {
         toValue: 1,
-        friction: 15,
-        tension: 100
-      }).start(),
-      Animated.spring(this.state.playerOpacity, {
+        duration: 200,
+        easing: Easing.elastic(0.8)
+      }),
+      Animated.timing(this.state.playerOpacity, {
         toValue: .25,
-        friction: 15,
-        tension: 100
-      }).start()
+        duration: 200,
+        easing: Easing.elastic(0.8)
+      })
     ]).start(() => {
       this.setState({
         isOpen: false
