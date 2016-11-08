@@ -151,8 +151,7 @@ export default class TabBar extends React.Component {
       ]).start(() => {
         StatusBar.setHidden(true, true);
         this.setState({
-          isOpen: true,
-          overrideSwipe: true
+          isOpen: true
         })
       });
     }
