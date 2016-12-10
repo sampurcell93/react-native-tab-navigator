@@ -14,7 +14,7 @@ import {
 import Layout from './Layout';
 import StaticContainer from './StaticContainer';
 
-const {height} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 export default class TabBar extends React.Component {
   static propTypes = {
@@ -194,7 +194,7 @@ export default class TabBar extends React.Component {
           {this.props.children}
         </Animated.View>
         <StaticContainer ref={c => this.swipeUpContent = c} shouldUpdate={this.state.isOpen}>
-          <Animated.View style={{opacity: this.state.playerOpacity}}>
+          <Animated.View style={[styles.swipeUpWrapper, {opacity: this.state.playerOpacity}]}>
             {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
           </Animated.View>
         </StaticContainer>
@@ -213,6 +213,9 @@ let styles = StyleSheet.create({
     right: 0,
     borderTopColor: '#eee',
     borderTopWidth: 1
+  },
+  swipeUpWrapper: {
+    width, height
   },
   inner: {
     elevation: 12,
