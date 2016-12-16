@@ -240,6 +240,7 @@ let styles = StyleSheet.create({
   },
   withPlayer: {
     top: Layout.tabBarHeight - 97,
-    height: 97
+    height: 97,
+    borderTopWidth: 0
   }
 });
