@@ -7,14 +7,18 @@ import React, {
 import {
   StyleSheet,
   View,
+  Dimensions,
+  LayoutAnimation,
+  Animated
 } from 'react-native';
-
 import Badge from './Badge';
 import Layout from './Layout';
 import StaticContainer from './StaticContainer';
 import Tab from './Tab';
 import TabBar from './TabBar';
 import TabNavigatorItem from './TabNavigatorItem';
+
+const {width, height} = Dimensions.get('window');
 
 export default class TabNavigator extends React.Component {
   static propTypes = {
@@ -23,6 +27,7 @@ export default class TabNavigator extends React.Component {
     tabBarStyle: TabBar.propTypes.style,
     tabBarShadowStyle: TabBar.propTypes.shadowStyle,
     hidesTabTouch: PropTypes.bool,
+    hasPlayer: PropTypes.bool,
     renderSwipeUpContent: PropTypes.func
   };
 
@@ -44,11 +49,9 @@ export default class TabNavigator extends React.Component {
       ),
     });
   }
-
   _getSceneKey(item, index): string {
     return `scene-${(item.key !== null) ? item.key : index}`;
   }
-
   _updateRenderedSceneKeys(children, oldSceneKeys = Set()): Set {
     let newSceneKeys = Set().asMutable();
     React.Children.forEach(children, (item, index) => {
@@ -72,17 +75,21 @@ export default class TabNavigator extends React.Component {
 
       let { selected } = item.props;
       let scene =
-        <SceneContainer key={sceneKey} selected={selected} style={sceneStyle}>
+        <SceneContainer hasPlayer={this.props.hasPlayer} key={sceneKey} selected={selected} style={sceneStyle}>
           {item}
         </SceneContainer>;
 
       scenes.push(scene);
     });
-
     return (
       <View {...props} style={[styles.container, style]}>
         {scenes}
-        <TabBar style={tabBarStyle} shadowStyle={tabBarShadowStyle} renderSwipeUpContent={this.props.renderSwipeUpContent} canSwipeUp={this.props.canSwipeUp} renderPlayer={this.props.renderPlayer}>
+        <TabBar style={tabBarStyle}
+          shadowStyle={tabBarShadowStyle}
+          renderSwipeUpContent={this.props.renderSwipeUpContent}
+          canSwipeUp={this.props.canSwipeUp}
+          hasPlayer={this.props.hasPlayer}
+          renderPlayer={this.props.renderPlayer}>
           {React.Children.map(children, this._renderTab)}
         </TabBar>
       </View>
@@ -138,7 +145,6 @@ class SceneContainer extends React.Component {
     ...View.propTypes,
     selected: PropTypes.bool,
   };
-
   render() {
     let { selected, ...props } = this.props;
     return (
@@ -149,27 +155,51 @@ class SceneContainer extends React.Component {
         style={[
           styles.sceneContainer,
           selected ? null : styles.hiddenSceneContainer,
-          props.style,
+          props.style
         ]}>
         <StaticContainer shouldUpdate={selected}>
           {this.props.children}
         </StaticContainer>
+        {this.props.hasPlayer && <PlayerSpacer />}
       </View>
     );
   }
 }
 
+class PlayerSpacer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {shouldRender: false};
+  }
+  componentWillMount() {
+    setTimeout(() => {
+      LayoutAnimation.easeInEaseOut();
+      this.setState({shouldRender: true})
+    }, 900)
+  }
+  render() {
+    if (!this.state.shouldRender) {
+      return false;
+    }
+    return <View style={styles.playerSpacer}/>
+  }
+}
+
 let styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height, width
   },
   sceneContainer: {
     position: 'absolute',
+    height,
+    width,
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
     paddingBottom: 57
+  },
+  playerSpacer: {
+    height: 40,
+    width
   },
   hiddenSceneContainer: {
     overflow: 'hidden',

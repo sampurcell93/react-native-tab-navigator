@@ -26,9 +26,9 @@ export default class TabBar extends React.Component {
     this.state = {
       positionY: new Animated.Value(0),
       tabBarOpacity: new Animated.Value(1),
-      playerOpacity: new Animated.Value(0),
+      swipeUpContentOpacity: new Animated.Value(0),
       overrideSwipe: false,
-      maxHeight: -(height - 56),
+      maxHeight: -height,
       isOpen: false
     }
     this.swipeUpRenderProps = {
@@ -79,15 +79,16 @@ export default class TabBar extends React.Component {
         // The most recent move distance is gestureState.move{X,Y}
         if (!this.state.isOpen && this.props.canSwipeUp) {
           if (dy <= 0) {
+            console.log(.25 + Math.abs(dy / maxHeight))
             this.state.positionY.setValue(dy)
             this.state.tabBarOpacity.setValue(1 - (dy / maxHeight))
-            this.state.playerOpacity.setValue(.25 + (dy / maxHeight))
+            this.state.swipeUpContentOpacity.setValue(.25 + Math.abs(dy / maxHeight))
           }
         } else {
           if (dy >= 0) {
             this.state.positionY.setValue(maxHeight + dy)
             this.state.tabBarOpacity.setValue(dy / Math.abs(maxHeight))
-            this.state.playerOpacity.setValue(1.25 - (dy / Math.abs(maxHeight)))
+            this.state.swipeUpContentOpacity.setValue(1.25 - (dy / Math.abs(maxHeight)))
           }
         }
         // }
@@ -148,7 +149,7 @@ export default class TabBar extends React.Component {
           duration: 200,
           easing: Easing.elastic(0.8)
         }),
-        Animated.timing(this.state.playerOpacity, {
+        Animated.timing(this.state.swipeUpContentOpacity, {
           toValue: 1,
           duration: 200,
           easing: Easing.elastic(0.8)
@@ -175,7 +176,7 @@ export default class TabBar extends React.Component {
         duration: 200,
         easing: Easing.elastic(0.8)
       }),
-      Animated.timing(this.state.playerOpacity, {
+      Animated.timing(this.state.swipeUpContentOpacity, {
         toValue: .25,
         duration: 200,
         easing: Easing.elastic(0.8)
@@ -188,13 +189,15 @@ export default class TabBar extends React.Component {
   }
   render() {
     return (
-      <Animated.View {...this.props} style={[styles.container, {transform: [{translateY: this.state.positionY}]}]} {...this.pan.panHandlers}>
-        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, {opacity: this.state.tabBarOpacity}]}>
-          {this.props.renderPlayer && this.props.renderPlayer(this.swipeUpRenderProps)}
-          {this.props.children}
+      <Animated.View {...this.props} style={[styles.container, this.props.hasPlayer && styles.withPlayer, {transform: [{translateY: this.state.positionY}]}]} {...this.pan.panHandlers}>
+        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={{opacity: this.state.tabBarOpacity}}>
+          {this.props.hasPlayer && this.props.renderPlayer()}
+          <View style={[this.props.style, styles.inner]}>
+            {this.props.children}
+          </View>
         </Animated.View>
         <StaticContainer ref={c => this.swipeUpContent = c} shouldUpdate={this.state.isOpen}>
-          <Animated.View style={[styles.swipeUpWrapper, {opacity: this.state.playerOpacity}]}>
+          <Animated.View style={[styles.swipeUpWrapper, {opacity: this.state.swipeUpContentOpacity}]}>
             {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
           </Animated.View>
         </StaticContainer>
@@ -211,25 +214,21 @@ let styles = StyleSheet.create({
     top: Layout.tabBarHeight - 57,
     left: 0,
     right: 0,
-    borderTopColor: '#eee',
-    borderTopWidth: 1
+    bottom: 0,
+    borderTopWidth: 1,
+    borderTopColor: '#eee'
   },
   swipeUpWrapper: {
     width, height
   },
   inner: {
     elevation: 12,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
     shadowColor: 'rgba(0,0,0,0.5)',
     shadowRadius: -3,
     shadowOffset: {width: 0, height: 10},
-    flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-start',
+    flexDirection: 'row'
   },
   shadow: {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
@@ -239,4 +238,8 @@ let styles = StyleSheet.create({
     right: 0,
     top: Platform.OS === 'android' ? 0 : -Layout.pixel,
   },
+  withPlayer: {
+    top: Layout.tabBarHeight - 97,
+    height: 97
+  }
 });
