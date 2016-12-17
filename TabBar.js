@@ -26,7 +26,7 @@ export default class TabBar extends React.Component {
     this.state = {
       positionY: new Animated.Value(0),
       tabBarOpacity: new Animated.Value(1),
-      swipeUpContentOpacity: new Animated.Value(0),
+      swipeUpContentOpacity: new Animated.Value(1),
       overrideSwipe: false,
       maxHeight: -height,
       isOpen: false
@@ -196,7 +196,7 @@ export default class TabBar extends React.Component {
           </View>
         </Animated.View>
         <StaticContainer ref={c => this.swipeUpContent = c} shouldUpdate={this.state.isOpen}>
-          <Animated.View style={[styles.swipeUpWrapper, {opacity: this.state.swipeUpContentOpacity}]}>
+          <Animated.View style={[styles.swipeUpWrapper]}>
             {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
           </Animated.View>
         </StaticContainer>
