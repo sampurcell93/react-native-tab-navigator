@@ -79,16 +79,15 @@ export default class TabBar extends React.Component {
         // The most recent move distance is gestureState.move{X,Y}
         if (!this.state.isOpen && this.props.canSwipeUp) {
           if (dy <= 0) {
-            console.log(.25 + Math.abs(dy / maxHeight))
             this.state.positionY.setValue(dy)
             this.state.tabBarOpacity.setValue(1 - (dy / maxHeight))
-            this.state.swipeUpContentOpacity.setValue(.25 + Math.abs(dy / maxHeight))
+            // this.state.swipeUpContentOpacity.setValue(.25 + Math.abs(dy / maxHeight))
           }
         } else {
           if (dy >= 0) {
             this.state.positionY.setValue(maxHeight + dy)
             this.state.tabBarOpacity.setValue(dy / Math.abs(maxHeight))
-            this.state.swipeUpContentOpacity.setValue(1.25 - (dy / Math.abs(maxHeight)))
+            // this.state.swipeUpContentOpacity.setValue(1.25 - (dy / Math.abs(maxHeight)))
           }
         }
         // }
