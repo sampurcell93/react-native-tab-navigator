@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, {PropTypes} from 'react';
 import {
   Animated,
   Platform,
@@ -20,6 +20,10 @@ export default class TabBar extends React.Component {
   static propTypes = {
     ...Animated.View.propTypes,
     shadowStyle: View.propTypes.style,
+    onOpenSwipeContent: PropTypes.func,
+    onCloseSwipeContent: PropTypes.func,
+    renderSwipeUpContent: PropTypes.func,
+    renderPlayer: PropTypes.func
   };
   constructor(props) {
     super(props);
@@ -162,7 +166,7 @@ export default class TabBar extends React.Component {
           easing: Easing.elastic(0.8)
         })
       ]).start(() => {
-        StatusBar.setHidden(true, true);
+        this.props.onOpenSwipeContent && this.props.onOpenSwipeContent()
         this.setState({
           hasOpenedBefore: true,
           isOpen: true
@@ -171,7 +175,7 @@ export default class TabBar extends React.Component {
     }
   }
   animateClosed() {
-    StatusBar.setHidden(false, true);
+    this.props.onCloseSwipeContent && this.props.onCloseSwipeContent();
     Animated.parallel([
       Animated.timing(this.state.positionY, {
         toValue: 0,

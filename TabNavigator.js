@@ -89,6 +89,8 @@ export default class TabNavigator extends React.Component {
           renderSwipeUpContent={this.props.renderSwipeUpContent}
           canSwipeUp={this.props.canSwipeUp}
           hasPlayer={this.props.hasPlayer}
+          onOpenSwipeContent={this.props.onOpenSwipeContent}
+          onCloseSwipeContent={this.props.onCloseSwipeContent}
           renderPlayer={this.props.renderPlayer}>
           {React.Children.map(children, this._renderTab)}
         </TabBar>
