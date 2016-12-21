@@ -85,14 +85,14 @@ export default class TabBar extends React.Component {
         if (!this.state.isOpen && this.props.canSwipeUp) {
           if (dy <= 0) {
             this.state.positionY.setValue(dy)
-            this.state.tabBarPosition.setValue(57 * Math.abs(dy / 57))
+            this.state.tabBarPosition.setValue(57 * Math.abs(dy / maxHeight))
             this.state.tabBarWrapperOpacity.setValue(1 - (dy / maxHeight))
             this.state.swipeUpContentOpacity.setValue(.25 + Math.abs(dy / maxHeight))
           }
         } else {
           if (dy >= 0) {
             this.state.positionY.setValue(maxHeight + dy)
-            this.state.tabBarPosition.setValue(57 * Math.abs(dy / 57))
+            this.state.tabBarPosition.setValue(57 - 57 * Math.abs(dy / maxHeight))
             this.state.tabBarWrapperOpacity.setValue(dy / Math.abs(maxHeight))
             this.state.swipeUpContentOpacity.setValue(1 - (dy / Math.abs(maxHeight)))
           }
@@ -151,7 +151,7 @@ export default class TabBar extends React.Component {
           easing: Easing.elastic(0.8)
         }),
         Animated.timing(this.state.tabBarPosition, {
-          toValue: 0, 
+          toValue: 57, 
           duration: 200,
           easing: Easing.elastic(0.8)
         }),
