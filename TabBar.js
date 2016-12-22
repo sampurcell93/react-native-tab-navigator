@@ -206,9 +206,9 @@ export default class TabBar extends React.Component {
   render() {
     return (
       <Animated.View {...this.props} style={[styles.container, this.props.hasPlayer && styles.withPlayer]} {...this.pan.panHandlers}>
-        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={{opacity: this.state.tabBarWrapperOpacity}}>
+        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'}>
           {this.props.hasPlayer && 
-            <Animated.View style={{transform: [{translateY: this.state.positionY}]}}>
+            <Animated.View style={{opacity: this.state.tabBarWrapperOpacity, transform: [{translateY: this.state.positionY}]}}>
               {this.props.renderPlayer(this.swipeUpRenderProps)}
             </Animated.View>
           }
