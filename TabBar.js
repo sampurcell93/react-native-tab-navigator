@@ -216,11 +216,9 @@ export default class TabBar extends React.Component {
             {this.props.children}
           </Animated.View>
         </Animated.View>
-        <StaticContainer ref={c => this.swipeUpContent = c} shouldUpdate={this.state.isOpen}>
-          <Animated.View style={[styles.swipeUpWrapper, {transform: [{translateY: this.state.positionY}]}]}>
-            {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
-          </Animated.View>
-        </StaticContainer>
+        <Animated.View style={[styles.swipeUpWrapper, {transform: [{translateY: this.state.positionY}]}]}>
+          {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
+        </Animated.View>
       </Animated.View>
     );
   }
