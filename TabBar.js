@@ -205,41 +205,42 @@ export default class TabBar extends React.Component {
   }
   render() {
     return (
-      <Animated.View {...this.props} style={[styles.container, this.props.hasPlayer && styles.withPlayer]} {...this.pan.panHandlers}>
-        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'}>
-          {this.props.hasPlayer && 
-            <Animated.View style={{opacity: this.state.tabBarWrapperOpacity, transform: [{translateY: this.state.positionY}]}}>
-              {this.props.renderPlayer(this.swipeUpRenderProps)}
-            </Animated.View>
-          }
-          <Animated.View style={[this.props.style, styles.inner, {transform: [{translateY: this.state.tabBarPosition}]}]}>
-            {this.props.children}
+      <View {...this.props} style={[styles.container, this.props.hasPlayer && styles.withPlayer]} {...this.pan.panHandlers} pointerEvents='box-none'>
+        {this.props.hasPlayer && 
+          <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={{opacity: this.state.tabBarWrapperOpacity, transform: [{translateY: this.state.positionY}]}}>
+            {this.props.renderPlayer(this.swipeUpRenderProps)}
           </Animated.View>
+        }
+        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, {transform: [{translateY: this.state.tabBarPosition}]}]}>
+          {this.props.children}
         </Animated.View>
-        <Animated.View style={[styles.swipeUpWrapper, {transform: [{translateY: this.state.positionY}]}]}>
+        <Animated.View pointerEvents='box-none' style={[styles.swipeUpWrapper, {transform: [{translateY: this.state.positionY}]}]}>
           {this.props.renderSwipeUpContent && this.props.renderSwipeUpContent(this.swipeUpRenderProps)}
         </Animated.View>
-      </Animated.View>
+      </View>
     );
   }
 }
 
 let styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     height: Layout.tabBarHeight,
     position: 'absolute',
-    top: Layout.tabBarHeight - 57,
+    top: 0,
+    paddingTop: Layout.tabBarHeight - 57,
     left: 0,
     right: 0,
     bottom: 0,
     borderTopWidth: 1,
-    borderTopColor: '#eee'
+    borderTopColor: '#eee',
+    zIndex: 99
   },
   swipeUpWrapper: {
     width, height,
     position: 'absolute',
-    top: 0, left: 0,
+    top: height - 97,
+    left: 0,
     zIndex: -1
   },
   inner: {
@@ -260,8 +261,7 @@ let styles = StyleSheet.create({
     top: Platform.OS === 'android' ? 0 : -Layout.pixel,
   },
   withPlayer: {
-    top: Layout.tabBarHeight - 97,
-    height: 97,
+    paddingTop: Layout.tabBarHeight - 97,
     borderTopWidth: 0
   }
 });
