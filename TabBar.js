@@ -232,8 +232,6 @@ let styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
     zIndex: 99
   },
   swipeUpWrapper: {
@@ -250,7 +248,9 @@ let styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 10},
     justifyContent: 'space-around',
     alignItems: 'flex-start',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
   shadow: {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
