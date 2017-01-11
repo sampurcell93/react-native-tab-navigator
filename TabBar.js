@@ -48,6 +48,9 @@ export default class TabBar extends React.Component {
       },
       open: () => {
         this.animateOpen();
+      },
+      isSwipeUpContentOpen: () => {
+        return this.state.isOpen;
       }
     }
   }
