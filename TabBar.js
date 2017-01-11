@@ -33,7 +33,7 @@ export default class TabBar extends React.Component {
       swipeUpContentOpacity: new Animated.Value(1),
       tabBarWrapperOpacity: new Animated.Value(1),
       overrideSwipe: false,
-      maxHeight: -(height - 97),
+      maxHeight: -(height - 104),
       isOpen: false
     }
     this.swipeUpRenderProps = {
@@ -240,7 +240,7 @@ let styles = StyleSheet.create({
   swipeUpWrapper: {
     width, height,
     position: 'absolute',
-    top: height - 97,
+    top: height - 104,
     left: 0,
     zIndex: -1
   },
@@ -264,7 +264,7 @@ let styles = StyleSheet.create({
     top: Platform.OS === 'android' ? 0 : -Layout.pixel,
   },
   withPlayer: {
-    paddingTop: Layout.tabBarHeight - 97,
+    paddingTop: Layout.tabBarHeight - 104,
     borderTopWidth: 0
   }
 });
