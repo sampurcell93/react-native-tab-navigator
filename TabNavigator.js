@@ -197,10 +197,10 @@ let styles = StyleSheet.create({
     width,
     top: 0,
     left: 0,
-    paddingBottom: 57
+    paddingBottom: 45
   },
   playerSpacer: {
-    height: 47,
+    height: 42,
     width
   },
   hiddenSceneContainer: {

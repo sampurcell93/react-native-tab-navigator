@@ -33,7 +33,7 @@ export default class TabBar extends React.Component {
       swipeUpContentOpacity: new Animated.Value(1),
       tabBarWrapperOpacity: new Animated.Value(1),
       overrideSwipe: false,
-      maxHeight: -(height - 104),
+      maxHeight: -(height - 87),
       isOpen: false
     }
     this.swipeUpRenderProps = {
@@ -88,14 +88,14 @@ export default class TabBar extends React.Component {
         if (!this.state.isOpen && this.props.canSwipeUp) {
           if (dy <= 0) {
             this.state.positionY.setValue(dy)
-            this.state.tabBarPosition.setValue(57 * Math.abs(dy / maxHeight))
+            this.state.tabBarPosition.setValue(45 * Math.abs(dy / maxHeight))
             this.state.tabBarWrapperOpacity.setValue(1 - (dy / maxHeight))
             this.state.swipeUpContentOpacity.setValue(.25 + Math.abs(dy / maxHeight))
           }
         } else {
           if (dy >= 0) {
             this.state.positionY.setValue(maxHeight + dy)
-            this.state.tabBarPosition.setValue(57 - 57 * Math.abs(dy / maxHeight))
+            this.state.tabBarPosition.setValue(45 - 45 * Math.abs(dy / maxHeight))
             this.state.tabBarWrapperOpacity.setValue(dy / Math.abs(maxHeight))
             this.state.swipeUpContentOpacity.setValue(1 - (dy / Math.abs(maxHeight)))
           }
@@ -154,7 +154,7 @@ export default class TabBar extends React.Component {
           easing: Easing.elastic(0.8)
         }),
         Animated.timing(this.state.tabBarPosition, {
-          toValue: 57, 
+          toValue: 45, 
           duration: 200,
           easing: Easing.elastic(0.8)
         }),
@@ -214,7 +214,7 @@ export default class TabBar extends React.Component {
             {this.props.renderPlayer(this.swipeUpRenderProps)}
           </Animated.View>
         }
-        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, {transform: [{translateY: this.state.tabBarPosition}]}]}>
+        <Animated.View pointerEvents={this.state.isOpen ? 'none' : 'auto'} style={[this.props.style, styles.inner, this.props.hasPlayer && styles.innerPlayer, {transform: [{translateY: this.state.tabBarPosition}]}]}>
           {this.props.children}
         </Animated.View>
         <Animated.View pointerEvents='box-none' style={[styles.swipeUpWrapper, {transform: [{translateY: this.state.positionY}]}]}>
@@ -231,7 +231,7 @@ let styles = StyleSheet.create({
     height: Layout.tabBarHeight,
     position: 'absolute',
     top: 0,
-    paddingTop: Layout.tabBarHeight - 57,
+    paddingTop: Layout.tabBarHeight - 45,
     left: 0,
     right: 0,
     bottom: 0,
@@ -240,7 +240,7 @@ let styles = StyleSheet.create({
   swipeUpWrapper: {
     width, height,
     position: 'absolute',
-    top: height - 104,
+    top: height - 87,
     left: 0,
     zIndex: -1
   },
@@ -255,16 +255,11 @@ let styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },
-  shadow: {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    height: Layout.pixel,
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: Platform.OS === 'android' ? 0 : -Layout.pixel,
+  innerPlayer: {
+    borderTopWidth: 0
   },
   withPlayer: {
-    paddingTop: Layout.tabBarHeight - 104,
+    paddingTop: Layout.tabBarHeight - 87,
     borderTopWidth: 0
   }
 });
